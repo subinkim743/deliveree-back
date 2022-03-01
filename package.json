@@ -35,6 +35,8 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.2",
     "cross-env": "^7.0.3",
+    "form-data": "^4.0.0",
+    "got": "^11.8.3",
     "graphql": "^15.8.0",
     "joi": "^17.5.0",
     "jsonwebtoken": "^8.5.1",
@@ -69,6 +71,9 @@
     "typescript": "^4.3.5"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "moduleFileExtensions": [
       "js",
       "json",
@@ -83,6 +88,11 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "node_modules",
+      ".entity.ts",
+      ".constants.ts"
+    ]
   }
 }
