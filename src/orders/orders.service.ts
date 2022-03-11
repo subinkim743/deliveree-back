@@ -39,6 +39,7 @@ export class OrderService {
       let orderFinalPrice = 0;
       const orderItems: OrderItem[] = [];
       for (const item of items) {
+        // item is the json from the order user sent, dish is the json in the db
         const dish = await this.dishes.findOne(item.dishId);
         if (!dish) {
           return {
@@ -105,6 +106,7 @@ export class OrderService {
           where: {
             customer: user,
             ...(status && { status }),
+            // The conditional is to collect status despite being provided by the input or not
           },
         });
       } else if (user.role === UserRole.Delivery) {
@@ -121,6 +123,9 @@ export class OrderService {
           },
           relations: ['orders'],
         });
+        // This was an oversight of allowing owners to have multiple restaurants
+        // The flat makes orders appear from all restaurants indiscriminate of which restaurant the order is from.
+        // In realistic practice, that would be annoying for the owner to not be able to distinguish which restaurant each order is from.
         orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
         if (status) {
           orders = orders.filter((order) => order.status === status);
@@ -193,6 +198,7 @@ export class OrderService {
       const order = await this.orders.findOne(orderId, {
         relations: ['restaurant'],
       });
+      console.log(order.status);
       if (!order) {
         return {
           ok: false,
@@ -207,17 +213,31 @@ export class OrderService {
       }
       let canEdit = true;
       if (user.role === UserRole.Client) {
-        canEdit = false;
+        if (
+          status !== OrderStatus.Cancelled ||
+          order.status !== OrderStatus.Pending
+        ) {
+          canEdit = false;
+        }
       }
       if (user.role === UserRole.Owner) {
-        if (status !== OrderStatus.Cooking && status !== OrderStatus.Cooked) {
+        if (
+          (status !== OrderStatus.Cooking &&
+            status !== OrderStatus.Cooked &&
+            status !== OrderStatus.Cancelled) ||
+          (order.status !== OrderStatus.Pending &&
+            order.status !== OrderStatus.Cooked &&
+            order.status !== OrderStatus.Cooking)
+        ) {
           canEdit = false;
         }
       }
       if (user.role === UserRole.Delivery) {
         if (
-          status !== OrderStatus.PickedUp &&
-          status !== OrderStatus.Delivered
+          (status !== OrderStatus.PickedUp &&
+            status !== OrderStatus.Delivered) ||
+          (order.status !== OrderStatus.Cooked &&
+            order.status !== OrderStatus.PickedUp)
         ) {
           canEdit = false;
         }

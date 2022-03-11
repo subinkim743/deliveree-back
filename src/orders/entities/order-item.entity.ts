@@ -22,5 +22,7 @@ export class OrderItem extends CoreEntity {
 
   @Field((type) => [OrderItemOption], { nullable: true })
   @Column({ type: 'json', nullable: true })
+  // This is json because we want to provide flexibility with the customizations that might come in each dish.
+  // This runs the risk of abandoning typeORM checks on the backend, but we will check on the frontend.
   options?: OrderItemOption[];
 }
