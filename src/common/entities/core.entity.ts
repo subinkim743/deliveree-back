@@ -12,10 +12,10 @@ export class CoreEntity {
   id: number;
 
   @CreateDateColumn()
-  @Field((type) => Number)
+  @Field((type) => Date)
   createdAt: Date;
 
   @UpdateDateColumn()
-  @Field((type) => Number)
+  @Field((type) => Date)
   updatedAt: Date;
 }
