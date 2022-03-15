@@ -151,9 +151,11 @@ export class RestaurantService {
       };
     }
   }
+
   countRestaurants(category: Category) {
     return this.restaurants.count({ category });
   }
+
   async findCategoryBySlug({
     slug,
     page,
@@ -169,6 +171,9 @@ export class RestaurantService {
       const restaurants = await this.restaurants.find({
         where: {
           category,
+        },
+        order: {
+          isPromoted: 'DESC',
         },
         take: 25,
         skip: (page - 1) * 25,
@@ -193,6 +198,9 @@ export class RestaurantService {
       const [restaurants, totalResults] = await this.restaurants.findAndCount({
         skip: (page - 1) * 25,
         take: 25,
+        order: {
+          isPromoted: 'DESC',
+        },
       });
       return {
         ok: true,
@@ -290,8 +298,6 @@ export class RestaurantService {
       };
     }
   }
-
-  async checkDishOwner(ownerId: number, dishId: number) {}
 
   async editDish(
     owner: User,
